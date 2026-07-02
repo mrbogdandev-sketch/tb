@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Builds - Сборки Minecraft</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #111111;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--accent-color);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            z-index: 100;
+        }
+
+        .logo {
+            height: 40px;
+            margin-right: 1rem;
+            display: block;
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        main {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Раздел Хорроров */
+        .horror-section {
+            border: 4px solid var(--accent-color);
+            padding: 3rem 2rem 2rem;
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .horror-section::before {
+            content: 'ХОРРОРЫ';
+            position: absolute;
+            top: -14px;
+            left: 24px;
+            background: var(--bg-color);
+            padding: 0 12px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Карточка */
+        .card {
+            border: 2px solid var(--accent-color);
+            background: var(--bg-color);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 10px 10px 0px var(--accent-color);
+        }
+
+        .card-img-container {
+            width: 100%;
+            height: 220px;
+            border-bottom: 2px solid var(--accent-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Новый стиль отображения версии на карточке */
+        .card-version-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        /* Модальное окно (Глассморфизм) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 4px solid var(--accent-color);
+            box-shadow: 16px 16px 0px var(--accent-color);
+            width: 90%;
+            max-width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: transparent;
+            border: none;
+            font-size: 2.5rem;
+            font-weight: 300;
+            cursor: pointer;
+            color: var(--accent-color);
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Новый стиль отображения версии в модалке */
+        .modal-spec-line {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #555;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .modal-full-desc {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            color: #111;
+        }
+
+        .screenshots-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .screenshots-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .screenshot-img {
+            min-width: 240px;
+            height: 135px;
+            border: 2px solid var(--accent-color);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .download-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid var(--accent-color);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .download-btn:hover {
+            background: var(--bg-color);
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .horror-section { padding: 2rem 1rem 1rem; }
+            .modal-content { padding: 1.5rem; }
+            .modal-title { font-size: 1.8rem; }
+            .screenshot-img { min-width: 180px; height: 101px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo.svg" alt="The Builds" class="logo">
+        <div class="site-title">The Builds</div>
+    </header>
+
+    <main>
+        <section id="horror" class="horror-section">
+            <div class="grid">
+                
+                <div class="card" onclick="openModal('Bleak', 'Одиночная хоррор сборка. Никаких сложных, бесящих механик и крафтов. Только атмосфера и монстры.', '1.20.1 Forge', ['bleak1.png', 'bleak2.png', 'bleak3.png', 'bleak4.png', 'bleak5.png', 'bleak6.png', 'bleak7.png'])">
+                    <div class="card-img-container">
+                        <img src="card1.png" alt="Bleak">
+                        <div class="card-version-badge">1.20.1 Forge</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Bleak</h3>
+                        <p class="card-desc">Одиночная хоррор сборка. Никаких сложных, бесящих механик и крафтов.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <div id="buildModal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal(event)">&times;</button>
+            <h2 class="modal-title" id="modalTitle">Название</h2>
+            <span class="modal-spec-line" id="modalVersion">[ RUNS ON // VERSION ]</span>
+            <p class="modal-full-desc" id="modalDesc">Описание...</p>
+            
+            <div class="screenshots-title">Скриншоты</div>
+            <div class="screenshots-container" id="modalScreenshots">
+                </div>
+
+            <a href="#" class="download-btn">Скачать сборку</a>
+        </div>
+    </div>
+
+    <script>
+        function openModal(title, desc, version, screenshots) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDesc').textContent = desc;
+            document.getElementById('modalVersion').textContent = '[ RUNS ON // ' + version + ' ]';
+            
+            // Динамическое добавление скриншотов без заглушек
+            const container = document.getElementById('modalScreenshots');
+            container.innerHTML = ''; 
+            
+            screenshots.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'Screenshot';
+                img.className = 'screenshot-img';
+                container.appendChild(img);
+            });
+            
+            const modal = document.getElementById('buildModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('buildModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+    </script>
+
+</body>
+</html>
